@@ -43,7 +43,7 @@
             <div class="product" v-for="product in products">
               <div
                 class="product-thumb"
-                v-bind:style="{backgroundImage: 'url(' + product.image.fields.file.url + ')'}"
+                v-bind:style="{backgroundImage: 'url(' + product.imageUrl + ')'}"
               >
               </div>
               <div class="product-details">
@@ -72,6 +72,8 @@
 </template>
 
 <script>
+  import {PRODUCTS_COLLECTION} from '../firebase'
+
   export default {
     name: 'Home',
     data: () => {
@@ -85,12 +87,14 @@
     },
     methods: {
       loadData: function(){
-        return Promise.all([window.client.getEntries('products')])
-        .then(data => {
-          this.products = data[0].items.map(item => item.fields)
-        })
-
-      }
+        return PRODUCTS_COLLECTION
+          .onSnapshot(querySnapshot => {
+            this.products = []
+            querySnapshot.forEach(
+              doc => this.products.push(doc.data())
+            )
+          })
+        }
     }
   }
 </script>

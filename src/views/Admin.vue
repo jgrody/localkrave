@@ -14,7 +14,7 @@
           <span>Add Product</span>
         </a>
 
-        <table class="table is-fullwidth">
+        <table class="table is-fullwidth is-hoverable">
           <thead>
             <tr>
               <th>Image</th>
@@ -127,7 +127,12 @@
           >
             Save changes
           </button>
-          <button class="button">Cancel</button>
+          <button
+            class="button"
+            @click="cancelAdd"
+          >
+            Cancel
+          </button>
         </footer>
       </div>
     </div>
@@ -135,8 +140,7 @@
 </template>
 
 <script>
-const db = firebase.firestore()
-const storage = firebase.storage().ref()
+import {storage, PRODUCTS_COLLECTION} from '../firebase'
 
 export default {
   name: 'Admin',
@@ -144,7 +148,8 @@ export default {
     return {
       products: [],
       newProduct: {
-        productPhoto: {}
+        productPhoto: {},
+        name: '',
       },
       addModalOpen: false,
     }
@@ -155,7 +160,7 @@ export default {
   },
   methods: {
     fetchProducts: function (){
-      db.collection("products")
+      PRODUCTS_COLLECTION
         .onSnapshot(querySnapshot => {
           this.products = []
           querySnapshot.forEach(
@@ -163,16 +168,10 @@ export default {
           )
         })
     },
-    hideModal: function (){
-      this.addModalOpen = false
-    },
-    resetNewProduct: function (){
-      this.newProduct = {}
-    },
     save: function (){
       const {name, slug, price, description} = this.newProduct
 
-      db.collection('products').doc(this.newProduct.slug).set({
+      PRODUCTS_COLLECTION.doc(this.newProduct.slug).set({
         name,
         slug,
         price,
@@ -198,13 +197,12 @@ export default {
         .then(url => this.updateProductImage(product, url))
     },
     updateProductImage: function (product, url){
-      return db
-        .collection('products')
+      return PRODUCTS_COLLECTION
         .doc(product.slug)
         .set({ imageUrl: url, }, { merge: true })
     },
     remove: function (product){
-      return db.collection('products')
+      return PRODUCTS_COLLECTION
         .doc(product.slug)
         .delete()
         .then(() => this.removeImage(product))
@@ -218,7 +216,20 @@ export default {
     },
     setPhoto: function (){
       this.newProduct.productPhoto = this.$refs.productPhoto.files[0]
-    }
+    },
+    hideModal: function (){
+      this.addModalOpen = false
+    },
+    resetNewProduct: function (){
+      this.newProduct.name = ''
+      this.newProduct.slug = ''
+      this.newProduct.price = ''
+      this.newProduct.description = ''
+    },
+    cancelAdd: function (){
+      this.addModalOpen = false;
+      this.resetNewProduct()
+    },
   }
 }
 </script>
