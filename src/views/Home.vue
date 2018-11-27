@@ -41,16 +41,21 @@
           </h1>
           <div class="products-container">
             <div class="product" v-for="product in products">
-              <div>
-                <figure class="image">
-                  <img
-                    v-bind:src="`https:${product.image.fields.file.url}?w=210`"
-                    v-bind:alt="product.name"
-                    width="210"
-                  >
-                </figure>
+              <div
+                class="product-thumb"
+                v-bind:style="{backgroundImage: 'url(' + product.image.fields.file.url + ')'}"
+              >
               </div>
               <div class="product-details">
+                <div>
+                  <div style="margin-bottom: 10px;">
+                    <b style="margin-right: 5px;">{{product.name}}</b>
+                    <b style="color: darkgoldenrod">${{product.price}}</b>
+                  </div>
+                  <div style="margin-bottom: 25px; color: darkslategray;">
+                    {{product.description}}
+                  </div>
+                </div>
                 <a class="button is-success">
                   <span class="icon is-small">
                     <i class="fas fa-check"></i>
@@ -97,32 +102,38 @@
   .products-container {
     display: flex;
     justify-content: flex-start;
-    align-items: baseline;
+    align-items: stretch;
     flex-wrap: wrap;
   }
 
   .product {
     display: flex;
-    align-items: center;
     flex-direction: column;
     background: white;
-    border: 3px solid gainsboro;
     border-radius: 4px;
-    padding: 5px;
-    min-width: 200px;
-    margin-bottom: 20px;
+    margin: 0 5px 20px 5px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1 25%;
+    position: relative;
 
-    &:not(:first-child):not(:last-child) {
-      margin: 0 5px;
+    &:hover {
+      top: -2px;
+      box-shadow: 0 4px 5px rgba(0,0,0,0.2);
     }
 
-    img {
-      max-height: 138px;
+    .product-thumb {
+      background-size: cover;
+      background-position: center center;
+      padding-bottom: 60%;
     }
 
     .product-details {
-      padding: 10px 5px;
-      width: 100%;
+      padding: 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
   }
 
@@ -155,10 +166,26 @@
     }
   }
 
+  @media screen and (min-width: 960px) {
+    .product {
+      flex: 1 23%;
+    }
+  }
+
   @media screen and (max-width: 769px) {
+    .product {
+      flex: 1 45%;
+    }
     .greeting-hero-img-container {
       display: none;
     }
   }
+
+  @media screen and (max-width: 500px) {
+    .product {
+      flex: 1 100%;
+    }
+  }
+
 
 </style>
