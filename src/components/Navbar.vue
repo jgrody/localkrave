@@ -46,6 +46,13 @@
           About
         </router-link>
 
+        <router-link
+          class="navbar-item"
+          to="/admin"
+        >
+          Admin
+        </router-link>
+
         <div class="navbar-item">
           <a class="button">
             <span class="icon">
