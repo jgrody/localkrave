@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar is-light">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://localkrave.com">
+      <a class="navbar-item" href="http://localkrave.com">
         <img v-bind:src="`localkravebrand.png`" alt="Local Krave">
       </a>
       <div
@@ -21,38 +21,6 @@
       v-bind:class="[isActive ? activeClass : '']"
     >
       <div class="navbar-end">
-        <router-link
-          class="navbar-item"
-          to="/"
-        >
-          Home
-        </router-link>
-        <router-link
-          class="navbar-item"
-          to="/menu"
-        >
-          Menu
-        </router-link>
-        <router-link
-          class="navbar-item"
-          to="/market"
-        >
-          Market
-        </router-link>
-        <router-link
-          class="navbar-item"
-          to="/about"
-        >
-          About
-        </router-link>
-
-        <router-link
-          class="navbar-item"
-          to="/admin"
-        >
-          Admin
-        </router-link>
-
         <div class="navbar-item">
           <a class="button">
             <span class="icon">
@@ -67,18 +35,18 @@
 </template>
 
 <script>
-  export default {
-    name: "Navbar",
-    data: function (){
-      return {
-        isActive: false,
-        activeClass: 'is-active',
-        doit: () => {
-          this.isActive = !this.isActive
-        }
+export default {
+  name: "Navbar",
+  data: function() {
+    return {
+      isActive: false,
+      activeClass: "is-active",
+      doit: () => {
+        this.isActive = !this.isActive;
       }
-    }
-  };
+    };
+  }
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

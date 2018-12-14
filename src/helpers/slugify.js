@@ -1,10 +1,10 @@
-export const slugify = function (string){
+export const slugify = function(string) {
   return string
-    .split(' ')
+    .split(" ")
     .map(s => {
-      s = s.toLowerCase()
-      return s.replace(/[^a-zA-Z ]/g, "")
+      s = s.toLowerCase();
+      return s.replace(/[^a-zA-Z ]/g, "");
     })
     .filter(s => s)
-    .join('-')
-}
+    .join("-");
+};

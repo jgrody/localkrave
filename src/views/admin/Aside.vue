@@ -11,9 +11,9 @@
 </template>
 
 <script>
-  export default {
-    name: "AdminMenu",
-  };
+export default {
+  name: "AdminMenu"
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

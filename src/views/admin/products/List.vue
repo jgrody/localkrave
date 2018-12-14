@@ -17,9 +17,16 @@
             <div class="level-right">
               <a
                 class="button is-success"
-                @click="addModalOpen = true"
+                @click="openAddModal()"
+                style="margin-right: 10px;"
               >
                 <span>Add Product</span>
+              </a>
+              <a
+                class="button is-warning"
+                @click="importData()"
+              >
+                <span>Import</span>
               </a>
             </div>
           </nav>
@@ -29,30 +36,49 @@
               <thead>
                 <tr>
                   <th>Image</th>
-                  <th>Name</th>
-                  <th>Slug</th>
+                  <th style="width: 20%;">Brand</th>
+                  <th style="width: 20%;">Name</th>
                   <th>Price</th>
                   <th>Description</th>
+                  <th>Displaying?</th>
+                  <th>In Stock?</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="product in products">
+                <tr v-for="product in sortedByBrand" v-bind:key="product.slug">
                   <td>
                     <img
+                      v-if="product.imageUrl"
                       v-bind:src="product.imageUrl"
                       width="50"
                     >
+                    <img
+                      v-if="!product.imageUrl"
+                      src="https://via.placeholder.com/50"
+                    >
                   </td>
+                  <td>{{product.brand}}</td>
                   <td>{{product.name}}</td>
-                  <td>{{product.slug}}</td>
                   <td>{{product.price}}</td>
                   <td>{{product.description}}</td>
                   <td>
-                    <a class="button is-primary" style="margin-right: 10px;">Edit</a>
+                    {{product.displaying ? 'Yes' : 'No'}}
+                  </td>
+                  <td>
+                    {{product.available ? 'Yes' : 'No'}}
+                  </td>
+                  <td>
+                    <a
+                      class="button is-primary"
+                      style="margin-right: 10px;"
+                      @click="openEditModal(product)"
+                    >
+                      Edit
+                    </a>
                     <a
                       class="button is-danger"
-                      v-on:click="remove(product)"
+                      @click="remove(product)"
                     >
                       Delete
                     </a>
@@ -65,6 +91,7 @@
       </div>
     </section>
     <admin-products-add-modal
+      v-if="addModalOpen"
       :isOpen="addModalOpen"
       :product="newProduct"
       v-on:update:addModalOpen="closeModal"
@@ -73,61 +100,101 @@
 </template>
 
 <script>
-  import {storage, PRODUCTS_COLLECTION} from '../../../firebase'
-  import AdminMenu from '../Aside'
-  import AdminProductsAddModal from './Add'
+import { storage, PRODUCTS_COLLECTION } from "../../../firebase";
+import AdminMenu from "../Aside";
+import AdminProductsAddModal from "./Add";
+import { slugify } from "../../../helpers/slugify";
 
-  export default {
-    name: 'Admin',
-    components: {
-      AdminMenu,
-      AdminProductsAddModal
+export default {
+  name: "Admin",
+  components: {
+    AdminMenu,
+    AdminProductsAddModal
+  },
+  data: () => {
+    return {
+      products: [],
+      newProduct: {
+        productPhoto: {},
+        name: ""
+      },
+      addModalOpen: false
+    };
+  },
+  created: function() {
+    this.fetchProducts();
+  },
+  computed: {
+    sortedByBrand: function (){
+      return this.products.sort((a, b) => {
+        return a.brand > b.brand
+      })
     },
-    data: () => {
-      return {
-        products: [],
-        newProduct: {
-          productPhoto: {},
-          name: '',
-        },
-        addModalOpen: false,
+  },
+  methods: {
+    fetchProducts: function() {
+      PRODUCTS_COLLECTION.onSnapshot(querySnapshot => {
+        this.products = [];
+        querySnapshot.forEach(doc => this.products.push(doc.data()));
+      });
+    },
+    remove: function(product) {
+      return PRODUCTS_COLLECTION.doc(product.slug)
+        .delete()
+        .then(() => this.removeImage(product));
+    },
+    removeImage: function(product) {
+      if (product.productImage) {
+        return storage.child(`product_images/${product.slug}.jpg`).delete();
       }
     },
-    created: function (){
-      this.fetchProducts()
+    resetNewProduct: function() {
+      this.newProduct.brand = "";
+      this.newProduct.name = "";
+      this.newProduct.blend = "";
+      this.newProduct.description = "";
+      this.newProduct.price = "";
+      this.newProduct.size = "12oz";
+      this.newProduct.displaying = false;
+      this.newProduct.available = true;
+      this.newProduct.slug = "";
     },
-    methods: {
-      fetchProducts: function (){
-        PRODUCTS_COLLECTION
-          .onSnapshot(querySnapshot => {
-            this.products = []
-            querySnapshot.forEach(
-              doc => this.products.push(doc.data())
-            )
-          })
-      },
-      remove: function (product){
-        return PRODUCTS_COLLECTION
-          .doc(product.slug)
-          .delete()
-          .then(() => this.removeImage(product))
-      },
-      removeImage: function (product){
-        return storage.child(`product_images/${product.slug}.jpg`).delete()
-      },
-      resetNewProduct: function (){
-        this.newProduct.name = ''
-        this.newProduct.slug = ''
-        this.newProduct.price = ''
-        this.newProduct.description = ''
-      },
-      cancelAdd: function (){
-        this.addModalOpen = false;
-        this.resetNewProduct()
-      },
-      closeModal: function (){
-        this.addModalOpen = false
-      },
+    importData: function (){
+      Sheetsu.read('https://sheetsu.com/apis/v1.0su/f8724fe0fdbc.json', {}, (data) => {
+        data.forEach(product => {
+          const {
+            brand,
+            name,
+            description,
+            price
+          } = product;
+
+          const slug = (product.slug = slugify(name));
+
+          product.size = "12oz"
+          product.displaying = true;
+          product.available = true;
+
+          let promise = PRODUCTS_COLLECTION.doc(slug).set(product);
+        })
+      })
+    },
+    openAddModal: function() {
+      this.resetNewProduct();
+      this.addModalOpen = true;
+    },
+    openEditModal: function(product) {
+      this.newProduct = { ...product };
+      this.newProduct.productPhoto = this.newProduct.productPhoto || {};
+      this.addModalOpen = true;
+    },
+    cancelAdd: function() {
+      this.addModalOpen = false;
+      this.resetNewProduct();
+    },
+    closeModal: function() {
+      this.addModalOpen = false;
     }
   }
+};
 </script>
