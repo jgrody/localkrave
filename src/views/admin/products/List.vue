@@ -174,6 +174,7 @@ export default {
           product.size = "12oz"
           product.displaying = true;
           product.available = true;
+          product.brandSlug = slugify(brand)
 
           let promise = PRODUCTS_COLLECTION.doc(slug).set(product);
         })
