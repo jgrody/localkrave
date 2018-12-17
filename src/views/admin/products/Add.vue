@@ -182,14 +182,14 @@ export default {
         size,
         displaying,
         available
-      } = this.product;
-      const slug = (this.product.slug = slugify(name));
+      } = product;
+
+      const slug = (product.slug = slugify(product.name));
 
       let imageUrl = this.$refs.productPhoto.files.length ?
-        null :
-        this.product.imageUrl
+        null : product.imageUrl;
 
-      let promise = PRODUCTS_COLLECTION.doc(slug).set({
+      let data = {
         ...(brand && { brand }),
         ...(name && { name }),
         ...(blend && { blend }),
@@ -199,12 +199,28 @@ export default {
         ...(size && { size }),
         ...(imageUrl && { imageUrl }),
         displaying: JSON.parse(displaying),
-        available: JSON.parse(available),
-      });
-      if (this.$refs.productPhoto.files.length) {
-        promise.then(() => this.storeImage(this.product));
+        available: JSON.parse(available)
       }
-      promise.then(() => this.closeModal()).catch(() => {});
+
+      let ref = PRODUCTS_COLLECTION.doc(slug)
+      ref.get().then(product => {
+        if (product.exists) {
+          let promise = ref.update(data)
+          promise.then(cleanup.bind(this))
+        } else {
+          let promise = ref.set(data)
+          promise.then(cleanup.bind(this))
+        }
+      })
+
+      function cleanup(){
+        return this.closeModal()
+      }
+
+      // if (this.$refs.productPhoto.files.length) {
+      //   promise.then(() => this.storeImage(product));
+      // }
+      // promise.then(() => this.closeModal()).catch(() => {});
     },
     storeImage: function(product) {
       return storage

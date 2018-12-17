@@ -39,7 +39,7 @@
                   <th style="width: 20%;">Brand</th>
                   <th style="width: 20%;">Name</th>
                   <th>Price</th>
-                  <th>Description</th>
+                  <th style="width: 20%;">Description</th>
                   <th>Displaying?</th>
                   <th>In Stock?</th>
                   <th>Actions</th>
@@ -125,11 +125,11 @@ export default {
     this.fetchProducts();
   },
   computed: {
-    sortedByBrand: function (){
+    sortedByBrand: function() {
       return this.products.sort((a, b) => {
-        return a.brand > b.brand
-      })
-    },
+        return a.brand > b.brand;
+      });
+    }
   },
   methods: {
     fetchProducts: function() {
@@ -159,26 +159,25 @@ export default {
       this.newProduct.available = true;
       this.newProduct.slug = "";
     },
-    importData: function (){
-      Sheetsu.read('https://sheetsu.com/apis/v1.0su/f8724fe0fdbc.json', {}, (data) => {
-        data.forEach(product => {
-          const {
-            brand,
-            name,
-            description,
-            price
-          } = product;
+    importData: function() {
+      Sheetsu.read(
+        "https://sheetsu.com/apis/v1.0su/f8724fe0fdbc.json",
+        {},
+        data => {
+          data.forEach(product => {
+            const { brand, name } = product;
 
-          const slug = (product.slug = slugify(name));
+            const slug = (product.slug = slugify(name));
 
-          product.size = "12oz"
-          product.displaying = true;
-          product.available = true;
-          product.brandSlug = slugify(brand)
+            product.size = "12oz";
+            product.displaying = true;
+            product.available = true;
+            product.brandSlug = slugify(brand);
 
-          let promise = PRODUCTS_COLLECTION.doc(slug).set(product);
-        })
-      })
+            PRODUCTS_COLLECTION.doc(slug).set(product);
+          });
+        }
+      );
     },
     openAddModal: function() {
       this.resetNewProduct();

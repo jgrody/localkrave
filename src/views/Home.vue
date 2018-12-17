@@ -2,19 +2,37 @@
   <div class="home">
     <section class="section ghostwhite">
       <div class="container is-fullhd master-container">
-        <aside class="menu">
+        <div style="padding: 20px;">
+          <div class="select is-rounded brand-select">
+            <select @change="onSelect()" v-model="filter">
+              <option value="null">
+                All Blends
+              </option>
+              <option v-for="brand in brands">
+                {{brand}}
+              </option>
+            </select>
+          </div>
+        </div>
+        <aside class="menu brand-menu">
           <p class="menu-label">
             Brands
           </p>
           <ul class="menu-list">
-            <li v-for="brand in brands">
-              <a @click="filterByBrand(brand)">
-                {{brand}}
+            <li>
+              <a
+                @click="filterByBrand(null)"
+                v-bind:class="{'is-active': filter === null}"
+              >
+                All Blends
               </a>
             </li>
-            <li>
-              <a @click="filterByBrand(null)">
-                All Blends
+            <li v-for="brand in brands" v-bind:key="brand">
+              <a
+                @click="filterByBrand(brand)"
+                v-bind:class="{'is-active': filter === brand}"
+              >
+                {{brand}}
               </a>
             </li>
           </ul>
@@ -78,36 +96,37 @@ export default {
   data: () => {
     return {
       filter: null,
-      products: [],
+      products: []
     };
   },
   created: function() {
     this.loadData();
   },
   methods: {
+    onSelect: function (){
+      this.filter = this.filter === "null" ? null : this.filter
+    },
     loadData: function() {
       return PRODUCTS_COLLECTION.onSnapshot(querySnapshot => {
         this.products = [];
         querySnapshot.forEach(doc => this.products.push(doc.data()));
       });
     },
-    filterByBrand: function (brand){
+    filterByBrand: function(brand) {
       this.filter = brand;
     }
   },
   computed: {
-    sortedByBrand: function (){
-      let products = this.filter ?
-        this.products.filter(p => p.brand == this.filter) :
-        this.products
+    sortedByBrand: function() {
+      let products = this.filter
+        ? this.products.filter(p => p.brand == this.filter)
+        : this.products;
 
-      return products
-        .filter(product => product.displaying)
-        // .sort((a, b) => a.brand > b.brand)
+      return products.filter(p => p.displaying && p.available)
     },
-    brands: function (){
-      const brands = this.products.map(p => p.brand)
-      return Array.from(new Set(brands))
+    brands: function() {
+      const brands = this.products.map(p => p.brand);
+      return Array.from(new Set(brands)).sort((a, b) => a > b)
     }
   }
 };
@@ -239,6 +258,10 @@ export default {
   position: absolute;
 }
 
+.brand-select {
+  display: none;
+}
+
 @media screen and (max-width: 804px) {
   .product {
     flex: 1 100%;
@@ -253,6 +276,18 @@ export default {
     .is-success {
       align-self: flex-start;
     }
+  }
+
+  .master-container {
+    display: block;
+  }
+
+  .brand-menu {
+    display: none;
+  }
+
+  .brand-select {
+    display: inline-block;
   }
 }
 </style>
