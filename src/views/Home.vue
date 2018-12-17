@@ -74,7 +74,7 @@
                   {{product.description}}
                 </div> -->
               </div>
-              <a class="button is-success">
+              <a class="button is-warning">
                 <span class="icon is-small">
                   <i class="fas fa-check"></i>
                 </span>
