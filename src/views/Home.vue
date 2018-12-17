@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { PRODUCTS_COLLECTION } from "../firebase";
+import { PRODUCTS_COLLECTION } from "../configs";
 
 export default {
   name: "Home",

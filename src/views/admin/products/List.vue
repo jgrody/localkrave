@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { storage, PRODUCTS_COLLECTION } from "../../../firebase";
+import { storage, PRODUCTS_COLLECTION } from "../../../configs";
 import AdminMenu from "../Aside";
 import AdminProductsAddModal from "./Add";
 import { slugify } from "../../../helpers/slugify";

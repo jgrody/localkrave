@@ -155,7 +155,7 @@
 </template>
 
 <script>
-import { storage, PRODUCTS_COLLECTION } from "../../../firebase";
+import { storage, PRODUCTS_COLLECTION } from "../../../configs";
 import { slugify } from "../../../helpers/slugify";
 
 export default {
