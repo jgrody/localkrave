@@ -2,9 +2,9 @@
   <div class="admin-products">
     <section class="section">
       <div class="columns">
-        <div class="column is-one-quarter">
-          <admin-menu></admin-menu>
-        </div>
+        <!-- <div class="column is-one-quarter"> -->
+          <!-- <admin-menu></admin-menu> -->
+        <!-- </div> -->
         <div class="column">
           <nav class="level is-mobile">
             <div class="level-left">
