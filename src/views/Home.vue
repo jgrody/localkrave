@@ -74,7 +74,7 @@
                   {{product.description}}
                 </div> -->
               </div>
-              <a class="button is-warning">
+              <a class="button is-warning add-to-cart">
                 <span class="icon is-small">
                   <i class="fas fa-check"></i>
                 </span>
@@ -273,7 +273,7 @@ export default {
       width: 125px;
     }
 
-    .is-success {
+    .add-to-cart {
       align-self: flex-start;
     }
   }
